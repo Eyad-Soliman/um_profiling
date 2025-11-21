@@ -1,0 +1,13 @@
+halt.um
+build_arithmetic_test.um
+build_cmov_non_zero_test.um
+build_cmov_zero_test.um
+build_divide_truncate_test.um
+build_io_test.um
+build_load_progam_test.um
+build_load_segment_test.um
+build_LV_and_output.um
+build_map_unmap_test.um
+build_nand_test.um
+build_special_io_test.um
+build_sstore_sload_test.um

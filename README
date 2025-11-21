@@ -1,0 +1,103 @@
+HW6: Universal Machine (UM)
+Karla Armoush and Eyad Soliman
+
+- We believe that all parts of the assigment have been implemented correctly
+- No major differences from the design document
+- Program Architecture:
+
+um.c (The program's main driver)
+Abstraction: UM front end that owns the fetch-decode-execute loop.
+Secrets: Holds the program counter, keeps a pointer to segment 0 for speed.
+Relationships:
+Client of memory for all segment access and of registers for register state.
+Directs to operations after decoding each 32bit word with the Bitpack interface
+
+memory.c/.h
+Abstraction: A segmented-memory heap addressable by 32bit IDs plus word offsets
+Secrets: 
+        - Internally stores all segments in a Seq_T sequence of UArray_T blocks
+        with a second Seq_T acting as a tracker of recycled IDs.
+        - Segment 0 is always mapped.
+        - IDs are recycled.
+        - All allocation/deallocation details are hidden.
+Relationships:
+Serves um.c (initial program load) and serves operations for some of the memory
+operations such as map/unmap, segmented store and load.. etc.
+Never touches registers directly.
+
+registers.c/.h
+Abstraction: Eight 32-bit registers addressed 0-7.
+Secrets: 
+        - Implemented as a plain uint32_t regs[8].
+        - Zero-initialized once at the beginning of the machine cycle.
+Relationships:
+Serves operations for every instruction.
+
+operations.c/.h
+Abstraction: Functions that implement the 14 UM opcodes provided in the spec.
+Secrets: Internally handles all of the instructions.
+Relationships:
+um.c uses operations.c after decoding.
+Clients: 
+        - Calls memory and registers to observe or change machine state.
+        - Never touches the fetch loop.
+        
+Note that we are also using the CS40 provided bitpack.c.A at the
+decode stage (used by um.c).
+Other external libraries used include Hanson Seq_T and UArray_T
+
+Time to perform 50 Million Instructions
+
+    We estimate our program to take ~2 seconds to perform 50 million
+    UM instructions. We tested this using midmark.um (which has ~80 million
+    instructions according to the lab10 spec) and the cputiming interface
+    that we were provided with back during the assignment locality. Before
+    beginning the program loop, we kept a counter that began at 0 for the
+    number of instructions executed, and when that reached 50 million,
+    we had it stop the timer and print the time it took perform them. The
+    cputiming interface generally gave us values between 1.8-2.2 seconds.
+
+    Note: when using the -O3 compiler flag, we were getting times in the
+    range 1.1-1.4 seconds on average
+
+Unit Tests Used: We tested using the provided lab testing framework
+
+1) halt_test: 
+calls the HALT instruction once and confirms that the UM stops
+immediately when opcode 7 is executed
+2) LV_and_output_test:
+uses LV to load the bytes H e l l o 40 \n into registers and outputs them using
+the OUTPUT instruction
+3) io_test:
+Reads 8 bytes from stdin (using successive INPUT calls) and then ouputs them 
+using the OUTPUT instruction. 
+4) special_io_test:
+Same io purpose as the test above, but intended to test inputting and 
+outputting
+non-printable ASCII characters.
+5) arithmetic_test: 
+tests the addition, multiplication and division instructions
+to compute the ASCII characters for "c" "a" "t" and the newline character.
+6) divide_truncate test:
+divides 100 by 3 and outputs 33 demonstration floor division.
+7) nand_test: 
+reads one byte, NANDs it with 0x0F, NANDs with self to isolate the lower 4 bits
+and adds 48 to turn it into a readable ASCII digit before ouput
+8) cmov_zero_test:
+executes CMOV with condition register = 0, verifies it behaves as a no op.
+9) cmov_mov_non_zero_test:
+executes CMOV with condition register not equal to 0, verifies the move occurs.
+10) load_progam_test:
+uses LOADP with rb = 0 to stay in segment 0 but jump PC forward, skipping three
+HALTs.
+11) map_unmap_test:
+tests MAP, UNMAP, and ID recycling logic.
+maps segments of sizes 50 and 100 (IDs 1 and 2), unmap ID 1, maps again to show
+the ID is recycled, and prints the IDs.
+12) sstore_sload_test:
+maps a segment, SSTOREs the byte 'a' at offset 4, then SLOADs it back and 
+outputs it. validates segment memory write/read operations.
+13) load_segment_test:
+builds a small segment containing an encoded HALT, stores it into word 4, 
+then LOADPs that segment and jumps to word 4, confirms deep-copy duplication of
+a non-zero segment and correct PC reset.
