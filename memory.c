@@ -59,13 +59,13 @@ uint32_t map(Memory mem, uint32_t segment_size) // returns assigned ID of seg
         /* initialize a zero-ed segment of passed size */
         UArray_T segment = UArray_new(segment_size, word_size);
         assert(segment != NULL);
-        for (int i = 0; i < UArray_length(segment); i++) {
+        int segment_length = UArray_length(segment);
+        for (int i = 0; i < segment_length; i++) {
                 uint32_t *word_p = UArray_at(segment, i);
                 *word_p = 0;
         }
 
         uint32_t id;
-
         /* case where we have an ID we can reuse */
         if (Seq_length(mem->ids) > 0) {
                 id = (uint32_t)(uintptr_t)Seq_remlo(mem->ids);
@@ -173,7 +173,8 @@ void memory_free(Memory mem)
         assert(mem != NULL);
         
         /* FREE DATA INSIDE SEGMENT SEQUENCE */
-        for (int i = 0; i < Seq_length(mem->segments); i++) {
+        int sequence_length = Seq_length(mem->segments);
+        for (int i = 0; i < sequence_length; i++) {
                 UArray_T segment = Seq_get(mem->segments, i);
                 if (segment != NULL) UArray_free(&segment);
         }
@@ -206,7 +207,8 @@ void load_segment(Memory mem, uint32_t segment_ID)
         /* initializes a new segment and copies values */
         UArray_T duplicate = UArray_new(UArray_length(segment), word_size);
         assert(duplicate != NULL);
-        for (int i = 0; i < UArray_length(duplicate); i++) {
+        int segment_length = UArray_length(duplicate);
+        for (int i = 0; i < segment_length; i++) {
                 uint32_t *word_p = UArray_at(duplicate, i);
                 *word_p = *(uint32_t *)UArray_at(segment, i);
         }
