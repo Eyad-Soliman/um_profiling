@@ -36,7 +36,8 @@ IFLAGS = -I. -I$(COMP40)/build/include -I$(HANSON)/include/cii
 
 
 # the next line enables you to compile and link against course software
-CFLAGS = -g -std=gnu99 -Wall -Wextra -Werror -Wfatal-errors -pedantic $(IFLAGS)
+CFLAGS = -g -std=gnu99 -Wall -Wextra -Werror \
+         -Wfatal-errors -pedantic -lcii-O2 $(IFLAGS)
 
 # Linking flags, used in the linking step
 # Set debugging information and update linking path
