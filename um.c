@@ -210,17 +210,17 @@ void decode_instruction(uint32_t word, instruction *instr)
 {
         assert(instr != NULL);
 
-        instr->opcode = Bitpack_getu(word, 4, 28);
+        instr->opcode = word >> 28;
         assert(instr->opcode < 14);
 
         if (instr->opcode == LV) {
-                instr->ra = Bitpack_getu(word, 3, 25);
+                instr->ra = ((word >> 25) & 7);
         } else {
-                instr->ra = Bitpack_getu(word, 3, 6);
+                instr->ra = ((word >> 6) & 7);
         }
         
-        instr->rb = Bitpack_getu(word, 3, 3);
-        instr->rc = Bitpack_getu(word, 3, 0);
-        instr->value = Bitpack_getu(word, 25, 0);
+        instr->rb = ((word >> 3) & 7);
+        instr->rc = (word & 7);
+        instr->value =  (word & ((1ul << 25) - 1));
 
 }
