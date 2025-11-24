@@ -22,9 +22,9 @@ typedef struct Memory *Memory;
 
 Memory load_segment0(UArray_T program);
 
-void load_segment(Memory mem, uint32_t segment_ID);
+void load_segment(Memory mem, uint32_t segment_ID, uint32_t **program_base);
 
-UArray_T get_segment(Memory mem, uint32_t segment_ID);
+//UArray_T get_segment(Memory mem, uint32_t segment_ID);
 
 uint32_t get_word(Memory mem, uint32_t segment_ID, uint32_t word_offset);
 

@@ -60,9 +60,10 @@ uint32_t map(Memory mem, uint32_t segment_size) // returns assigned ID of seg
         UArray_T segment = UArray_new(segment_size, word_size);
         assert(segment != NULL);
         int segment_length = UArray_length(segment);
+        uint32_t *segment_idx = UArray_at(segment, 0);
         for (int i = 0; i < segment_length; i++) {
-                uint32_t *word_p = UArray_at(segment, i);
-                *word_p = 0;
+                *segment_idx = 0;
+                segment_idx++;
         }
 
         uint32_t id;
@@ -113,12 +114,15 @@ void unmap(Memory mem, uint32_t segment_ID)
  * checked errors: asserts mem is not NULL
  * notes: none
  */
-UArray_T get_segment(Memory mem, uint32_t segment_ID)
-{
-        assert(mem != NULL);
 
-        return Seq_get(mem->segments, segment_ID);
-}
+#define get_segment(mem, segment_ID) Seq_get(mem->segments, segment_ID)
+
+// UArray_T get_segment(Memory mem, uint32_t segment_ID)
+// {
+//         assert(mem != NULL);
+
+//         return Seq_get(mem->segments, segment_ID);
+// }
 
 /* name: get_word
  * purpose: fetch a 32-bit word from a given segment and offset
@@ -196,7 +200,7 @@ void memory_free(Memory mem)
  * notes: implements the load value instruction. if the segment id is 0, the 
  *        function still gets a deep copy of the segment.    
  */
-void load_segment(Memory mem, uint32_t segment_ID)
+void load_segment(Memory mem, uint32_t segment_ID, uint32_t **program_base)
 {
         assert(mem != NULL);
 
@@ -206,6 +210,7 @@ void load_segment(Memory mem, uint32_t segment_ID)
 
         /* initializes a new segment and copies values */
         UArray_T duplicate = UArray_new(UArray_length(segment), word_size);
+        *program_base = UArray_at(duplicate, 0);
         assert(duplicate != NULL);
         int segment_length = UArray_length(duplicate);
         for (int i = 0; i < segment_length; i++) {

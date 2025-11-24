@@ -202,15 +202,16 @@ void input(Um_registers rc)
  * checked errors: CRE if mem or pc is NULL
  * notes: if r[B] == 0, only PC is updated
  */
-void load_program(Memory mem, Um_registers rb, Um_registers rc, uint32_t *pc)
+void load_program(Memory mem, Um_registers rb, Um_registers rc, uint32_t **pc,
+                  uint32_t **program_base)
 {
         assert(mem != NULL);
         assert(pc != NULL);
         if (get_register(rb) != 0) {
-                load_segment(mem, get_register(rb));
-        }
+                load_segment(mem, get_register(rb), program_base);
+        } 
 
-        *pc = get_register(rc);
+        *pc = *program_base + get_register(rc);
 }   
 
 /* name: load_value

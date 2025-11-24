@@ -41,6 +41,7 @@ void output(Um_registers rc);
 
 void input(Um_registers rc);
 
-void load_program(Memory mem, Um_registers rb, Um_registers rc, uint32_t *pc);
+void load_program(Memory mem, Um_registers rb, Um_registers rc,
+                  uint32_t **pc, uint32_t **program_base);
 
 void load_value(Um_registers ra, uint32_t value);

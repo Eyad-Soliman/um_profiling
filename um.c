@@ -29,7 +29,8 @@ typedef struct instruction {
 
 void read_program(FILE *fp, UArray_T *program_p);
 uint32_t read_word(FILE *fp);
-void execute_operation(Memory mem, instruction *instr, uint32_t *pc);
+void execute_operation(Memory mem, instruction instr,
+                       uint32_t **pc, uint32_t **program_base);
 void decode_instruction(uint32_t word, instruction *instr);
 
  /* main
@@ -56,6 +57,10 @@ int main(int argc, char *argv[])
                 exit(EXIT_FAILURE);
         }
 
+        
+        FILE *fp = fopen(argv[1], "rb");
+        assert(fp != NULL);
+        
         struct stat file_info;
 
         if(stat(argv[1], &file_info) == -1) {
@@ -63,22 +68,21 @@ int main(int argc, char *argv[])
                 exit(EXIT_FAILURE);
         }
 
-        FILE *fp = fopen(argv[1], "rb");
-        assert(fp != NULL);
 
         UArray_T program = UArray_new(file_info.st_size / 4, word_size);
         read_program(fp, &program);
         fclose(fp);
         Memory mem = load_segment0(program);
 
-        uint32_t pc = 0;
+        uint32_t *program_base = UArray_at(program, 0);
+        uint32_t *pc = program_base;
         instruction instr;
 
         while (1) {
-                uint32_t word = get_word(mem, 0, pc);
-                decode_instruction(word, &instr);
+                //uint32_t word = get_word(mem, 0, pc);
+                decode_instruction(*pc, &instr);
 
-                execute_operation(mem, &instr, &pc); // note: pass instr by reference to mitigate ecopies
+                execute_operation(mem, instr, &pc, &program_base); 
         }
         
         return EXIT_SUCCESS;
@@ -141,53 +145,55 @@ uint32_t read_word(FILE *fp)
  * checked errors: memory is not NULL and program counter pointer is not NULL
  * notes: n/a
  */
-void execute_operation(Memory mem, instruction *instr, uint32_t *pc)
+void execute_operation(Memory mem, instruction instr,
+                       uint32_t **pc, uint32_t **program_base)
 {
         assert(mem != NULL);
         assert(pc != NULL);
 
-        switch (instr->opcode) {
+        switch (instr.opcode) {
                 case CMOV:
-                        conditional_move(instr->ra, instr->rb, instr->rc);
+                        conditional_move(instr.ra, instr.rb, instr.rc);
                         break;
                 case SLOAD:
-                        segmented_load(mem, instr->ra, instr->rb, instr->rc);
+                        segmented_load(mem, instr.ra, instr.rb, instr.rc);
                         break;
                 case SSTORE:
-                        segmented_store(mem, instr->ra, instr->rb, instr->rc);
+                        segmented_store(mem, instr.ra, instr.rb, instr.rc);
                         break;
                 case ADD:
-                        addition(instr->ra, instr->rb, instr->rc);
+                        addition(instr.ra, instr.rb, instr.rc);
                         break;
                 case MUL:
-                        multiplication(instr->ra, instr->rb, instr->rc);
+                        multiplication(instr.ra, instr.rb, instr.rc);
                         break;
                 case DIV:
-                        division(instr->ra, instr->rb, instr->rc);
+                        division(instr.ra, instr.rb, instr.rc);
                         break;
                 case NAND:
-                        nand(instr->ra, instr->rb, instr->rc);
+                        nand(instr.ra, instr.rb, instr.rc);
                         break;
                 case HALT:
                         halt(mem);
                         break;
                 case ACTIVATE:
-                        map_segment(mem, instr->rb, instr->rc);
+                        map_segment(mem, instr.rb, instr.rc);
                         break;
                 case INACTIVATE:
-                        unmap_segment(mem, instr->rc);
+                        unmap_segment(mem, instr.rc);
                         break;
                 case OUT:
-                        output(instr->rc);
+                        output(instr.rc);
                         break;
                 case IN:
-                        input(instr->rc);
+                        input(instr.rc);
                         break;
                 case LOADP:
-                        load_program(mem, instr->rb, instr->rc, pc);
+                        load_program(mem, instr.rb, instr.rc,
+                                     pc, program_base);
                         return;
                 case LV:
-                        load_value(instr->ra, instr->value);
+                        load_value(instr.ra, instr.value);
                         break;
         }
 
