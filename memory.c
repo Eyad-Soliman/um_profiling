@@ -126,7 +126,7 @@ UArray_T get_segment(Memory mem, uint32_t segment_ID)
  *            segment_ID - segment to index
  *            word_offset - index within the segment
  * returns: 32-bit word stored at that location
- * effects: none
+ * effects: non
  * checked errors: asserts mem is not NULL
  * notes: none
  */
