@@ -18,7 +18,14 @@
 
 /* 32bit words so each word is 4 bytes */
 #define word_size 4
+struct Memory {
+        Seq_T segments;
+        Seq_T ids;
+};
 typedef struct Memory *Memory;
+
+/* memory object that will store segments and segment IDs */
+
 
 Memory load_segment0(UArray_T program);
 
@@ -26,6 +33,9 @@ void load_segment(Memory mem, uint32_t segment_ID, uint32_t **program_base);
 
 //UArray_T get_segment(Memory mem, uint32_t segment_ID);
 
+#define get_segment(mem, segment_ID) Seq_get(mem->segments, segment_ID)
+#define get_word(mem, segment_ID, word_offset) *(uint32_t *)UArray_at(get_segment(mem, segment_ID), word_offset)
+#define put_word(mem, segment_ID, word_offset, word) *(uint32_t *)UArray_at(get_segment(mem, segment_ID), word_offset) = word
 // uint32_t get_word(Memory mem, uint32_t segment_ID, uint32_t word_offset);
 
 // void put_word(Memory mem, uint32_t segment_ID,

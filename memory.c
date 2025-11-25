@@ -9,11 +9,7 @@
 
 #include "memory.h"
 
-/* memory object that will store segments and segment IDs */
-struct Memory {
-        Seq_T segments;
-        Seq_T ids;
-};
+
 
 /* name: load_segment0
  * purpose: create the Memory abstraction and install the program as segment 0
