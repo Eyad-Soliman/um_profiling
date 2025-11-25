@@ -26,10 +26,10 @@ void load_segment(Memory mem, uint32_t segment_ID, uint32_t **program_base);
 
 //UArray_T get_segment(Memory mem, uint32_t segment_ID);
 
-uint32_t get_word(Memory mem, uint32_t segment_ID, uint32_t word_offset);
+// uint32_t get_word(Memory mem, uint32_t segment_ID, uint32_t word_offset);
 
-void put_word(Memory mem, uint32_t segment_ID,
-              uint32_t word_offset, uint32_t word);
+// void put_word(Memory mem, uint32_t segment_ID,
+//               uint32_t word_offset, uint32_t word);
 
 // returns ID that segment was mapped to
 uint32_t map(Memory mem, uint32_t segment_size); 

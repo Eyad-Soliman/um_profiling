@@ -134,14 +134,17 @@ void unmap(Memory mem, uint32_t segment_ID)
  * checked errors: asserts mem is not NULL
  * notes: none
  */
-uint32_t get_word(Memory mem, uint32_t segment_ID, uint32_t word_offset)
-{
-        assert(mem != NULL);
+
+#define get_word(mem, segment_ID, word_offset) *(uint32_t *)UArray_at(get_segment(mem, segment_ID), word_offset)
+
+// uint32_t get_word(Memory mem, uint32_t segment_ID, uint32_t word_offset)
+// {
+//         assert(mem != NULL);
         
-        uint32_t *word_p = UArray_at(get_segment(mem, segment_ID),
-                                     word_offset);
-        return *word_p;
-}
+//         uint32_t *word_p = UArray_at(get_segment(mem, segment_ID),
+//                                      word_offset);
+//         return *word_p;
+// }
 
 /* name: put_word
  * purpose: store a 32-bit word into a given segment and offset
@@ -154,15 +157,17 @@ uint32_t get_word(Memory mem, uint32_t segment_ID, uint32_t word_offset)
  * checked errors: asserts mem is not NULL
  * notes: none
  */
-void put_word(Memory mem, uint32_t segment_ID,
-              uint32_t word_offset, uint32_t word)
-{
-        assert(mem != NULL);
+
+#define put_word(mem, segment_ID, word_offset, word) *(uint32_t *)UArray_at(get_segment(mem, segment_ID), word_offset) = word
+// void put_word(Memory mem, uint32_t segment_ID,
+//               uint32_t word_offset, uint32_t word)
+// {
+//         assert(mem != NULL);
         
-        uint32_t *word_p = UArray_at(get_segment(mem, segment_ID),
-                                     word_offset);
-        *word_p = word;
-}
+//         uint32_t *word_p = UArray_at(get_segment(mem, segment_ID),
+//                                      word_offset);
+//         *word_p = word;
+// }
 
 /* name: memory_free
  * purpose: release all heap storage owned by a Memory instance
